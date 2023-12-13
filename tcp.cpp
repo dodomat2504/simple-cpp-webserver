@@ -1,6 +1,5 @@
 #include "h/tcp.h"
 #include <iostream>
-#include "h/logger.h"
 
 
 void tcp::openListener(const int port, const int maxConnections, void (*messageHandler)(const sockaddr_in, HTTPServer*, const int), HTTPServer* obj, std::atomic_bool& running) {
@@ -51,7 +50,6 @@ void tcp::openListener(const int port, const int maxConnections, void (*messageH
         const int select_ret = select(serverFd + 1, &read_fds, NULL, NULL, &tv);
 
         if (select_ret == -1) {
-            Logger::err("Error occurred while waiting for acknowledgment packet");
             exit(EXIT_FAILURE);
         } else if (select_ret == 0) {
             continue;

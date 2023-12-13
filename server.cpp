@@ -1,6 +1,5 @@
 #include "h/http/server.h"
 #include <stdexcept>
-#include "h/logger.h"
 
 
 int HTTPServer::maxConnections = 10;
@@ -96,8 +95,6 @@ HTTPServer::~HTTPServer() {
 
 void HTTPServer::tcpConnectionRequestHandler(const sockaddr_in address, HTTPServer* s, const int socketid) {
 
-    Logger::debug("Verbindungsversuch von " + std::string(inet_ntoa(address.sin_addr)) + ":" + std::to_string(ntohs(address.sin_port)));
-
     {
         std::lock_guard<std::mutex> lock(s->tcpConnections_mutex);
         for (auto it = s->tcpConnections.begin(); it != s->tcpConnections.end(); ++it) {
@@ -117,11 +114,8 @@ void HTTPServer::tcpConnectionRequestHandler(const sockaddr_in address, HTTPServ
 
     // check if max connections is reached
     if (s->tcpConnections.size() >= HTTPServer::maxConnections) {
-        Logger::out("Maximale Anzahl an Verbindungen erreicht");
         return;
     }
-
-    Logger::debug("Verbindungsaufbau mit " + std::string(inet_ntoa(address.sin_addr)) + ":" + std::to_string(ntohs(address.sin_port)));
 
     {
         std::lock_guard<std::mutex> lock(s->tcpConnections_mutex);
@@ -181,7 +175,6 @@ http::Response HTTPServer::processHTTPRequest(const http::Request& req) const {
 }
 
 void HTTPServer::HTTPConnectionHandler(TCP_CONN_INFO* info) {
-    Logger::debug("Verbindung mit " + std::string(inet_ntoa(info->Address().sin_addr)) + ":" + std::to_string(ntohs(info->Address().sin_port)) + " hergestellt");
 
     struct timeval tv;
     tv.tv_sec = 0;
@@ -194,11 +187,9 @@ void HTTPServer::HTTPConnectionHandler(TCP_CONN_INFO* info) {
     const int select_ret = select(info->Socket() + 1, &read_fds, NULL, NULL, &tv);
 
     if (select_ret == -1) {
-        Logger::err("Error occurred while waiting for acknowledgment packet");
         exit(EXIT_FAILURE);
     } else if (select_ret == 0) {
         // timeout
-        Logger::debug("Timeout");
     } else {
         const int bufferSize = 2048;
         char buffer[bufferSize] = {0};
@@ -239,11 +230,4 @@ void HTTPServer::HTTPConnectionHandler(TCP_CONN_INFO* info) {
 
     info->stop();
     close(info->Socket());
-
-    Logger::debug("Verbindung mit " + std::string(inet_ntoa(info->Address().sin_addr)) + ":" + std::to_string(ntohs(info->Address().sin_port)) + " geschlossen");
-}
-
-void HTTPServer::printRoutes() const {
-    Logger::out("Routes:");
-    root->printAllRoutes();
 }

@@ -89,7 +89,4 @@ public:
     /// @param callback the callback function
     void DELETE(const std::string& route, std::function<http::Response(const http::Request&)> callback);
 
-    /// @brief Print all the routes
-    void printRoutes() const;
-
 };

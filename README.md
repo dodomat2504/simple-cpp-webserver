@@ -1,6 +1,6 @@
 # Simple-Cpp-webserver
 
-This project is a simple webserver written in C++. You can use it to serve static files or as a base for your own webserver. Just download the source code and compile it with your favorite compiler. The only dependency is the [jsoncpp library](https://github.com/open-source-parsers/jsoncpp).
+This project is a simple webserver written in C++. You can use it to create API endpoints. Just download the source code and integrate it into your project. You can inherit from the HTTPServer to add the functionality to your class. The only dependency is the [jsoncpp library](https://github.com/open-source-parsers/jsoncpp).
 
 I installed the jsoncpp library with the following commands:
 ```bash
